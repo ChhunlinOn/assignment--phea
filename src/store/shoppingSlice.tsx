@@ -1,23 +1,41 @@
-import { createSlice,PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
-interface ShoppingItem{
-    items: string[]
+// ✅ Define the ShoppingItem interface
+interface ShoppingItem {
+    items: string[];
 }
 
-const initailState:ShoppingItem = {
-    items:["Bread","Hot Dog"]
-}
+// ✅ Initial state
+const initialState: ShoppingItem = {
+    items: [],
+};
 
-const shoppinslice = createSlice({
-    name:"shopping",
-    initialState:initailState,
-    reducers:{
-        AddItem:(state, action: PayloadAction<string>) =>{
-            const newItem = action.payload;
-            state.items.push(newItem);
-        }
+// ✅ Async thunk to fetch todos
+export const fetchTodos = createAsyncThunk("shopping/fetchTodos", async () => {
+    const response = await fetch("https://jsonplaceholder.typicode.com/todos");
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
     }
-})
+    const data = await response.json();
+    return data.map((todo: { title: string }) => todo.title); // ✅ Extract only titles
+});
 
-export const {AddItem} = shoppinslice.actions;
-export default shoppinslice.reducer;
+// ✅ Create Redux slice
+const shoppingSlice = createSlice({
+    name: "shopping",
+    initialState,
+    reducers: {
+        AddItem: (state, action: PayloadAction<string>) => {
+            state.items.push(action.payload);
+        }
+    },
+    extraReducers: (builder) => {
+        builder.addCase(fetchTodos.fulfilled, (state, action: PayloadAction<string[]>) => {
+            state.items = action.payload; // ✅ Safe state update using Redux Toolkit's Immer
+        });
+    },
+});
+
+// ✅ Export actions and reducer
+export const { AddItem } = shoppingSlice.actions;
+export default shoppingSlice.reducer;

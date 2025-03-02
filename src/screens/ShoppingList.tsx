@@ -1,14 +1,21 @@
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
-
+import { useSelector,useDispatch } from "react-redux";
+import { RootState,AppDispatch } from "../store/store";
+import { useEffect } from "react";
+import { fetchTodos } from "../store/shoppingSlice";
 
 
 export const ShoppingList = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
   // const items = ["Apples", "Bananas", "Oranges"]
   const userName = useSelector((state: RootState) => state.Username.item)
   const items = useSelector((state: RootState) => state.Shopping.items);
+
+  useEffect(() => {
+    dispatch(fetchTodos()); // ✅ Dispatch fetchTodos when component mounts
+}, [dispatch]);
 
 
   return (

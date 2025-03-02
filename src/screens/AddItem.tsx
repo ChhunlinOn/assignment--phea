@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AppDispatch } from "../store/store";
 import { AddItem as addItem } from "../store/shoppingSlice";
+import { AddItem as setUsername } from "../store/userSlice"; // Import username action
 import { useDispatch } from "react-redux";
 
 export const AddItem = () => {
@@ -21,7 +22,9 @@ export const AddItem = () => {
 
   const handleSetName = () => {
     if (userName.trim()) {
-      setUserName("");
+      dispatch(setUsername(userName)); // Update Redux state
+      setUserName(""); // Clear input after setting the name
+      navigate("/"); // Navigate back to ShoppingList
     }
   };
 
